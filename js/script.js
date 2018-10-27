@@ -10,21 +10,21 @@ inputRub.addEventListener('input', () => {
 
             request.open('GET', 'js/current.json');
             request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            request.send();
 
-            request.onreadystatechange = function() {
-                if (request.readyState === 4 && request.status == 200) {
-                    resolve()
+            request.addEventListener('load', function() {
+                if (request.status < 400) {
+                    resolve(request.response)
                 } else {
-                    reject()
+                    reject(request.statusText)
                 }
-            }
+            });
+            request.send();
         });
     }
 
     convert(inputUsd, inputRub)
-        .then(()=> {
-            let data = JSON.parse(request.response);
+        .then((response)=> {
+            let data = JSON.parse(response);
             inputUsd.value = inputRub.value / data.usd;
         })
         .catch(()=> inputUsd.value = "Что-то пошло не так!");
